@@ -1,0 +1,22 @@
+<?php
+if (!isset($params['escape']) || $params['escape'] !== false) {
+    $message = h($message);
+}
+?>
+<!-- <div style="color:rgb(59, 161, 191);text-align:center" class="message success" onclick="this.classList.add('hidden')"><?= $message ?></div> -->
+
+<div class="row">
+<div class="span8 offset3">
+<div class="col-md-6">
+    <div class="box box-danger">
+        <div class="alert alert-success alert-dismissable">
+            <i class="fa fa-check"></i>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" style="margin: -2px 10px;">&times;</button>
+            <?= h($message) ?>
+        </div>
+        
+    </div><!-- /.box -->
+</div><!-- /.col -->
+    </div><!-- /.box -->
+</div><!-- /.col -->
+<!-- <div class="message success"><?= h($message) ?></div> -->
