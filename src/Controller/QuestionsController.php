@@ -147,17 +147,15 @@ public function ajaxCorrectOption(){
     	  	  }
     	  
 
-    	  	
+    	  	// exit;
 
 			$correct_option_num = $this->request->data['correct_option'];
 			// Update Question tbl by adding correct_option_id
 			$data = array('id' => $questionid, 'correct_option_id' => $optionid[$correct_option_num]);
-			//$questionTable = TableRegistry::get('Questions');
-            $que =$this->Questions->Options->get($questionid);
-           // $que = $questionTable->get($questionid); // 
-            $que = $this->Questions->Options->patchEntity($que,$data);
+            $que =$this->Questions->get($questionid);
+            $que = $this->Questions->patchEntity($que,$data);
         //  $que->correct_option_id = $optionid[$correct_option_num];
-			if ($this->Questions->Options->save($que)) {
+			if ($this->Questions->save($que)) {
 
 
 			    $this->Flash->success('Question has been saved.');
@@ -233,10 +231,13 @@ public function ajaxCorrectOption(){
 			              'question_id' => $id,
 			              'mark' => $option_mark);
     	  	    if(empty($result['id'])){
+
+    	  	 
+            $option = $this->Questions->newEntity($data);
     	  	   
-			$optionsTable = TableRegistry::get('Options');
-            $option = $optionsTable->newEntity($data);
-			if($optionsTable->save($option)){
+			//$optionsTable = TableRegistry::get('Options');
+           // $option = $optionsTable->newEntity($data);
+			if($this->Questions->Options->save($option)){
 			    $optionid[$key] = $option->id;
 	
 			}
@@ -247,14 +248,13 @@ public function ajaxCorrectOption(){
 			unset($data);
 		}  else {
     	  	   
-			$optionsTable = TableRegistry::get('Options');
-            $optionId =$result['id'];  
-			 $opt = $optionsTable->get($optionId); // 
-            $opt = $optionsTable->patchEntity($opt,$data);
-        	if ($optionsTable->save($opt)) {
+			// $optionsTable = TableRegistry::get('Options');
+            $optionId =$result['id']; 
+             $opt =$this->Questions->Options->get($optionId);
+             $opt = $this->Questions->patchEntity($opt,$data);
+            if ($this->Questions->Options->save($opt)) {
               $optionid[$key] = $opt->id;
-            
-			}
+            }
 			else{
 				 $this->Flash->error('Unable to save Option'.$key);
                 $this->redirect(array('action' => 'index'));
@@ -274,11 +274,11 @@ public function ajaxCorrectOption(){
 				          'name' => $this->request->data['name'],
 				          'number_of_option' => $this->request->data['number_of_option'],
 				          'correct_option_id'=> $correct_option_id);
-			$questionTable = TableRegistry::get('Questions');
-            $que = $questionTable->get($id); // 
-            $que = $questionTable->patchEntity($que,$data);
-        	if (!$questionTable->save($que)) {
-				$this->Session->setFlash('Unable to update question.');
+		//	$questionTable = TableRegistry::get('Questions');
+            $que = $this->Questions->get($id); // 
+            $que = $this->Questions->patchEntity($que,$data);
+        	if (!$this->Questions->save($que)) {
+				$this->Flash->error('Unable to update question.');
                 $this->redirect(array('action' => 'edit', $id));
 			}else{
             unset($data);
@@ -310,46 +310,7 @@ public function ajaxCorrectOption(){
           // debug($this->request->data); //exit;
 	        //debug($question[0]->options); exit;
 	        $this->set('options_select', $options_select); //Option['.$ii.'][name]
-    //         $OptionNumber=5;
-    //          $OptionNumberArray = range(1,$OptionNumber); 
-    //          $OptionNumberArrayResponse =array();
-
-		  // $question = $this->Questions->find('all', ['fields' => ['Questions.id','Questions.name','Questions.correct_option_id'],
-    //     									'conditions' => ['Questions.id' => $id],
-    //     									'contain' => [
-    //     										'Options' => [
-    //     											'fields' => ['Options.id','Options.question_id','Options.name']
-    //     										]
-    //     									]
-    //     								]);
-		  //  $question =$question->toArray();
-		  //  foreach($OptionNumberArray as $key=>$num){
-    //       	 if(!empty($question[0]['options'][$key]->id)){
-    //       	 $OptionNumberArrayResponse[$key]['id']=$question[0]['options'][$key]->id;
-    //      	 $OptionNumberArrayResponse[$key]['name']=$question[0]['options'][$key]->name;
-    //      	 $OptionNumberArrayResponse[$key]['question_id']=$question[0]['options'][$key]->question_id;
-    //      	}else{
-    //      	 $OptionNumberArrayResponse[$key]['id']=null;
-    //      	 $OptionNumberArrayResponse[$key]['name']=null;
-    //      	 $OptionNumberArrayResponse[$key]['question_id']=null;
-
-    //      	}
-
-    //       }
-	   //  debug($OptionNumberArrayResponse);
-	   
-	   // //  debug($question);
-	   //  debug($question[0]['options']); exit;
-
-
-
-
-
-	     
-	        // $this->request->data['Question']['option2'] = $question['Option'][1]['name'];
-	        // $this->request->data['Question']['option3'] = $question['Option'][2]['name'];
-	        // $this->request->data['Question']['option4'] = $question['Option'][3]['name'];
-
+    
 
 	    }
 	}

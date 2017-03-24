@@ -47,7 +47,7 @@ class QuizzQuestionsTable extends Table
             'foreignKey' => 'candidate_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('Quizzs', [
+        $this->belongsTo('Quizzes', [
             'foreignKey' => 'quizz_id',
             'joinType' => 'INNER'
         ]);
@@ -90,7 +90,7 @@ class QuizzQuestionsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['candidate_id'], 'Candidates'));
-        $rules->add($rules->existsIn(['quizz_id'], 'Quizzs'));
+        $rules->add($rules->existsIn(['quizz_id'], 'Quizzes'));
         $rules->add($rules->existsIn(['question_id'], 'Questions'));
         $rules->add($rules->existsIn(['option_id'], 'Options'));
 

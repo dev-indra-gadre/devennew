@@ -46,7 +46,7 @@
 $radio_options = array();
 $i=1;
 
-debug($question);
+//debug($question);
 foreach($question['question']['options'] as $option){
 
 	$radio_options[$option['id']] = $option['name'];
@@ -134,7 +134,7 @@ echo $this->Html->link($result['position'], ['controller' => $this->request->con
   
 
 
-
+<?php  //debug($question); ?>
 
 <script>
 // Set the date we're counting down to
@@ -161,14 +161,14 @@ echo $this->Html->link($result['position'], ['controller' => $this->request->con
     // If the count down is over, write some text 
   if (distance < 0) {
 
-    	var quiz_id=<?php echo $question['quiz_id']; ?>;
-      var elapsedTime = <?php echo $question['Quiz']['quiz_time']; ?>
+    	var quiz_id=<?php echo $question['quizz_id']; ?>;
+      var elapsedTime = <?php echo $question['quiz']['quiz_time']; ?>
       
     $.ajax({
         type:'POST',
         async: true,
         cache: false,
-          url:"ajax_result",
+           url: basePath+"ajax_result",
         
         success: function(response) {
         	  $('#quiz_question').css('display','none');

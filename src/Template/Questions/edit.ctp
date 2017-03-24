@@ -208,12 +208,45 @@ var OptionNumber = $("#OptionNumber").val();
        // return false;   
     });
 
-$("#UpdateQuestion").on('submit', function(){
- $.ajax({
-       
+ var OptionNumber = $("#OptionNumber").val();
+      var correct_option = $("#correct_option_hidden").val();
+
+        $.ajax({
+        type:'POST',
+          url: basePath+"ajax_correct_option",
          beforeSend: function() { 
          
         window.setTimeout(function() {
+            $(".load").css('display','block');
+            $(".load").fadeOut("slow");
+            
+              }, 1000);
+     
+
+           },
+        success: function(response) {
+            window.setTimeout(function() {
+                // New content replaces the loading image
+                $('#correct_option').html(response);
+            }, 1000);
+        },
+        data: ({ OptionNumber:OptionNumber,correct_option:correct_option })
+        });
+
+
+  $("#OptionNumber").on('change', function(){
+        
+        var OptionNumber = $("#OptionNumber").val();
+        var correct_option = $("#correct_option_hidden").val();
+        $.ajax({
+        type:'POST',
+       //  url: "../questions/ajax_option_dashboard",
+        //  url:"http://localhost/devencake2/questions/ajax_correct_option", 
+        // url: basePath+"questions/ajax_option_dashboard",
+          url: basePath+"ajax_correct_option",
+         beforeSend: function() { 
+         
+         window.setTimeout(function() {
             $(".load").css('display','block');
              $('#correct_option').css('display','none');
             $('#correct_option_label').css('display','none');
@@ -223,10 +256,18 @@ $("#UpdateQuestion").on('submit', function(){
 
             
               }, 1000);
+     
+
+           },
+        success: function(response) {
+            window.setTimeout(function() {
+                // New content replaces the loading image
+                $('#correct_option').html(response);
+            }, 1000);
         },
-   
-        
-        });   
+        data: ({ OptionNumber:OptionNumber,correct_option:correct_option })
+        });
+       // return false;   
     });
 
 

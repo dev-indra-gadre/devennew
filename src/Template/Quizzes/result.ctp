@@ -38,14 +38,15 @@
          
  <table width="82%" border="0" cellspacing="0" style="margin-left:226px;" cellpadding="0">
 <tr><td width="" valign="top"> Exam Name</td> <td width="" valign="top"> <?php
-$result=$result->toArray();
-debug($result); exit;
- echo $result['Quiz']['quiz_name']; ?> &nbsp</td></tr>
-<tr><td width="" valign="top"> Candidate Name</td> <td width="" valign="top"> <?php echo $candidates[$result['QuizCandidate'][0]['candidate_id']]; ?></td></tr>
-<tr><td width="" valign="top"> Maximum Time</td> <td width="" valign="top"> <?php echo $result['Quiz']['quiz_time']; ?> &nbsp; MIN</td></tr>
+
+// debug($candidates);
+// debug($result); exit;
+ echo $result['quiz_name']; ?> &nbsp</td></tr>
+<tr><td width="" valign="top"> Candidate Name</td> <td width="" valign="top"> <?php echo $candidates[$result['quizz_candidates'][0]['candidate_id']]; ?></td></tr>
+<tr><td width="" valign="top"> Maximum Time</td> <td width="" valign="top"> <?php echo $result['quiz_time']; ?> &nbsp; MIN</td></tr>
 <!-- <tr><td width="" valign="top"> Start Time</td> <td width="" valign="top"> Geography Exam</td></tr>
 <tr><td width="" valign="top"> End Time</td> <td width="" valign="top"> Geography Exam</td></tr> -->
-<tr><td width="" valign="top"> Elapsed Time</td> <td width="" valign="top"> <?php echo $result['QuizCandidate'][0]['elapsedTime']; ?>&nbsp; MIN</td></tr>
+<tr><td width="" valign="top"> Elapsed Time</td> <td width="" valign="top"> <?php echo $result['quizz_candidates'][0]['elapsedTime']; ?>&nbsp; MIN</td></tr>
  </table>
 
     <div style="height:20px;"></div>  
@@ -74,7 +75,7 @@ debug($result); exit;
           <th class="info">Score</th> 
         </thead>
             <tbody>
-          <?php if (count($result['QuizQuestion']) == 0) { ?>
+          <?php if (count($result['quizz_candidates']) == 0) { ?>
             <tr>
                 <td height="1" colspan="6" style="color:#FF0000;" align="center">
                     <b>No Record Found</b>
@@ -83,24 +84,27 @@ debug($result); exit;
             <?php } else {
 
    $srNo=1;
-         foreach($result['QuizQuestion'] as $key=>$result){?>
+         foreach($result['quizz_questions'] as $key=>$result){
+
+//debug($result);
+          ?>
 
        
             <tr>
             <td><?php echo $srNo; ?></td>
-            <td><?php echo $result['Question']['name']; ?></td>
-              <td><?php echo $result['Question']['mark']; ?></td>
+            <td><?php echo $result['question']['name']; ?></td>
+              <td><?php echo $result['option']['mark']; ?></td>
              <?php 
-            	if(isset($result['Option']['id'])): 
-            		$color = ($result['Question']['CorrectOption']['id'] == $result['Option']['id']) ? 'green' : 'red'; 
+            	if(isset($result['option']['id'])): 
+            		$color = ($result['question']['correct_option_id'] == $result['option']['id']) ? 'green' : 'red'; 
             	else: $color = 'black';
             	endif;
             ?>  
-            <td><font color=<?php echo $color; ?>><?php if(!empty($result['Option']['name'])){ echo $result['Option']['name'];} else{ ?> Not Attempt <?php } ?></font></td>
-            <td><?php echo $result['Question']['CorrectOption']['name']; ?></td>
+            <td><font color=<?php echo $color; ?>><?php if(!empty($result['option']['name'])){ echo $result['option']['name'];} else{ ?> Not Attempt <?php } ?></font></td>
+            <td><?php echo $result['option']['name']; ?></td>
             <?php 
-            	if(isset($result['Option']['id'])): 
-            		$score = ($result['Question']['CorrectOption']['id'] == $result['Option']['id']) ? $result['Question']['mark'] : 0; 
+            	if(isset($result['option']['id'])): 
+            		$score = ($result['question']['correct_option_id'] == $result['option']['id']) ? $result['option']['mark'] : 0; 
             	else: $score = 0;
             	endif;
             ?>  

@@ -44,9 +44,13 @@ class QuizzesTable extends Table
             'foreignKey' => 'candidate_id',
             'joinType' => 'INNER'
         ]);
-        //  $this->hasMany('QuizzQuestions', [
-        //     'foreignKey' => 'quizz_id'
-        // ]);
+         $this->hasMany('QuizzQuestions', [
+            'foreignKey' => 'quizz_id'
+        ]);
+
+            $this->hasMany('QuizzCandidates', [
+            'foreignKey' => 'quizz_id'
+        ]);
     }
 
     /**
@@ -55,50 +59,50 @@ class QuizzesTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
-        $validator
-            ->integer('id')
-            ->allowEmpty('id', 'create');
+    // public function validationDefault(Validator $validator)
+    // {
+    //     $validator
+    //         ->integer('id')
+    //         ->allowEmpty('id', 'create');
 
-        $validator
-            ->requirePresence('quiz_name', 'create')
-            ->notEmpty('quiz_name');
+    //     $validator
+    //         ->requirePresence('quiz_name', 'create')
+    //         ->notEmpty('quiz_name');
 
-        $validator
-            ->requirePresence('code', 'create')
-            ->notEmpty('code')
-            ->add('code', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+    //     $validator
+    //         ->requirePresence('code', 'create')
+    //         ->notEmpty('code')
+    //         ->add('code', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
-        $validator
-            ->integer('total_questions')
-            ->requirePresence('total_questions', 'create')
-            ->notEmpty('total_questions');
+    //     $validator
+    //         ->integer('total_questions')
+    //         ->requirePresence('total_questions', 'create')
+    //         ->notEmpty('total_questions');
 
-        $validator
-            ->integer('score')
-            ->allowEmpty('score');
+    //     $validator
+    //         ->integer('score')
+    //         ->allowEmpty('score');
 
-        $validator
-            ->numeric('quiz_time')
-            ->requirePresence('quiz_time', 'create')
-            ->notEmpty('quiz_time');
+    //     $validator
+    //         ->numeric('quiz_time')
+    //         ->requirePresence('quiz_time', 'create')
+    //         ->notEmpty('quiz_time');
 
-        $validator
-            ->requirePresence('elapsedTime', 'create')
-            ->notEmpty('elapsedTime');
+    //     $validator
+    //         ->requirePresence('elapsedTime', 'create')
+    //         ->notEmpty('elapsedTime');
 
-        $validator
-            ->dateTime('completed_date')
-            ->allowEmpty('completed_date');
+    //     $validator
+    //         ->dateTime('completed_date')
+    //         ->allowEmpty('completed_date');
 
-        $validator
-            ->boolean('status')
-            ->requirePresence('status', 'create')
-            ->notEmpty('status');
+    //     $validator
+    //         ->boolean('status')
+    //         ->requirePresence('status', 'create')
+    //         ->notEmpty('status');
 
-        return $validator;
-    }
+    //     return $validator;
+    // }
 
     /**
      * Returns a rules checker object that will be used for validating

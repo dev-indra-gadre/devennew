@@ -45,7 +45,7 @@ class QuizzCandidatesTable extends Table
             'foreignKey' => 'candidate_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('Quizzs', [
+        $this->belongsTo('Quizzes', [
             'foreignKey' => 'quizz_id',
             'joinType' => 'INNER'
         ]);
@@ -57,34 +57,34 @@ class QuizzCandidatesTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
-        $validator
-            ->integer('id')
-            ->allowEmpty('id', 'create');
+    // public function validationDefault(Validator $validator)
+    // {
+    //     $validator
+    //         ->integer('id')
+    //         ->allowEmpty('id', 'create');
 
-        $validator
-            ->integer('score')
-            ->requirePresence('score', 'create')
-            ->notEmpty('score');
+    //     $validator
+    //         ->integer('score')
+    //         ->requirePresence('score', 'create')
+    //         ->notEmpty('score');
 
-        $validator
-            ->numeric('elapsedTime')
-            ->requirePresence('elapsedTime', 'create')
-            ->notEmpty('elapsedTime');
+    //     $validator
+    //         ->numeric('elapsedTime')
+    //         ->requirePresence('elapsedTime', 'create')
+    //         ->notEmpty('elapsedTime');
 
-        $validator
-            ->dateTime('completed_date')
-            ->requirePresence('completed_date', 'create')
-            ->notEmpty('completed_date');
+    //     $validator
+    //         ->dateTime('completed_date')
+    //         ->requirePresence('completed_date', 'create')
+    //         ->notEmpty('completed_date');
 
-        $validator
-            ->boolean('status')
-            ->requirePresence('status', 'create')
-            ->notEmpty('status');
+    //     $validator
+    //         ->boolean('status')
+    //         ->requirePresence('status', 'create')
+    //         ->notEmpty('status');
 
-        return $validator;
-    }
+    //     return $validator;
+    // }
 
     /**
      * Returns a rules checker object that will be used for validating
@@ -96,7 +96,7 @@ class QuizzCandidatesTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['candidate_id'], 'Candidates'));
-        $rules->add($rules->existsIn(['quizz_id'], 'Quizzs'));
+        $rules->add($rules->existsIn(['quizz_id'], 'Quizzes'));
 
         return $rules;
     }

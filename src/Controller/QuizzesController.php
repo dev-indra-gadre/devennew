@@ -118,7 +118,7 @@ class QuizzesController extends AppController{
 				$quiz_questions =$selected_question_list;
 			}
 			foreach($quiz_questions as $key=> $quiz_question){
-				debug($quiz_question);
+			//	debug($quiz_question);
 				$data[] = array(
 					'candidate_id'=>$quiz_candidate,
 					'quizz_id' => $quizid, 
@@ -130,12 +130,13 @@ class QuizzesController extends AppController{
 			$data_candidate[] = array('candidate_id'=>$quiz_candidate,'quizz_id' => $quizid);
 		}
 		
-			 $QuizzQuestions = TableRegistry::get('QuizzQuestions');
-             $entities = $QuizzQuestions->newEntities($data);
-			if ($QuizzQuestions->saveMany($entities)) {
-			 $QuizzCandidates = TableRegistry::get('QuizzCandidates');
-             $entities = $QuizzCandidates->newEntities($data_candidate);
-			 $QuizzCandidates->saveMany($entities);
+			// $QuizzQuestions = TableRegistry::get('QuizzQuestions');
+            
+             $entities = $this->Quizzes->QuizzQuestions->newEntities($data);
+			if ($this->Quizzes->QuizzQuestions->saveMany($entities)) {
+			// $QuizzCandidates = TableRegistry::get('QuizzCandidates');
+             $entities = $this->Quizzes->QuizzCandidates->newEntities($data_candidate);
+			 $this->Quizzes->QuizzCandidates->saveMany($entities);
 			 $this->Flash->success('Quiz has been saved.');
              $this->redirect(array('action' => 'index'));
             } else {
@@ -146,9 +147,10 @@ class QuizzesController extends AppController{
     	if (!$this->request->data) { //debug($quiz); exit;    		
     		$candidates = $this->Quizzes->Candidates->find('list',['keyField' => 'id','valueField'=> 'name']);    		   		  		
 
-	    //	debug($candidates);
+	    //	debug($candidates->toArray());
 	    	$this->set('candidates', $candidates);
-	    								        
+
+	     						        
 	    $questions_count = $this->Quizzes->QuizzQuestions->Questions->find()->count();
 	    //	$questions_count = 10;
 	    	$i = 1;	    	
@@ -216,6 +218,99 @@ class QuizzesController extends AppController{
     	}    	    	
     }
 
+
+    function ajaxResult(){
+	$candidate_id =$this->request->session()->read('Auth.User.candidate_id');
+    	$this->viewBuilder()->layout("ajax");
+        // if ($this->request->is('ajax')) {
+             $quiz_id =$this->request->data['quiz_id'];
+             $elapsedTime =$this->request->data['elapsedTime'];
+
+    				$quiz_questions = $this->Quizzes->QuizzQuestions->find('all',[
+						'fields' => ['QuizzQuestions.option_id'],
+						'conditions' => ['QuizzQuestions.quizz_id' => $quiz_id,'QuizzQuestions.candidate_id' => $candidate_id],
+						'contain' => [
+							'Questions' => ['fields' => ['Questions.correct_option_id']]
+						]
+				]	);
+				$quiz_questions =$quiz_questions->toArray();
+				//debug($quiz_questions); exit;
+				$score = 0;
+				foreach($quiz_questions as $quiz_question){
+					if($quiz_question['QuizQuestion']['option_id'] == $quiz_question['Question']['correct_option_id'])
+						$score++;
+				}
+             $today = date('Y-m-d h:i:s');
+             $this->Quizzes->updateAll(
+				    ['elapsedTime' => $elapsedTime, 'completed_date' => "'$today'"],
+				    ['id' => $quiz_id]
+				);
+            $this->Quizzes->QuizzCandidates->updateAll(
+				    ['score' => $score, 'elapsedTime' => $elapsedTime, 'completed_date' => "'$today'"],
+				    ['quizz_id' => $quiz_id,'candidate_id' => $candidate_id]
+				);
+
+
+		// 		$result = $this->Quizzes->find('all', [
+		// 	'fields' => ['Quizzes.candidate_id','Quizzes.total_questions','Quizzes.score','Quizzes.quiz_name','Quizzes.quiz_time','Quizzes.elapsedTime','Quiz.completed_date'),
+  //       	'conditions' => array('Quiz.id' => $quiz_id),
+		//     'contain' => array(		        
+		//         'Candidate' => array(
+		//             'fields' => array('Candidate.name')
+		//         ),
+		//          'QuizCandidate' => array(
+		//             'fields' => array('QuizCandidate.score','QuizCandidate.candidate_id','QuizCandidate.elapsedTime','QuizCandidate.completed_date'),
+		//             'conditions' => array('QuizCandidate.candidate_id' => $candidate_id)
+		//         ),
+		//         'QuizQuestion' => array('fields' => array('QuizQuestion.id'),
+		//                 'conditions' => array('QuizQuestion.candidate_id' => $candidate_id),		            
+		//             'Option' => array('fields' => array('Option.id','Option.name')),
+		//             'Question' => array(
+		//                 'fields' => array('Question.name','Question.mark'),
+		//                 'CorrectOption' => array('fields' => array('CorrectOption.id','CorrectOption.name'))
+		//             )
+		//         )
+		//     )
+		// ));
+
+	$result = $this->Quizzes->find('all',[
+			//'fields' => ['Quizzes.candidate_id','Quizzes.total_questions','Quizzes.score','Quizzes.quiz_name','Quizzes.quiz_time','Quizzes.elapsedTime','Quizzes.completed_date'],
+        	'conditions' =>['Quizzes.id' =>  $quiz_id],
+		    'contain' => [		        
+		      
+		        'QuizzCandidates'
+		         => [
+		            'fields' => ['QuizzCandidates.quizz_id','QuizzCandidates.score','QuizzCandidates.candidate_id','QuizzCandidates.elapsedTime','QuizzCandidates.completed_date'],
+		            'conditions' => ['QuizzCandidates.candidate_id' => $candidate_id]
+		        ],
+
+		        'QuizzQuestions' => ['fields' => ['QuizzQuestions.quizz_id'],	
+		          'conditions' => ['QuizzQuestions.candidate_id' => $candidate_id],		            
+		            'Options' => ['fields' => ['Options.id','Options.name','Options.mark']],
+		            'Questions' => [
+		                'fields' => ['Questions.name','Questions.mark','Questions.correct_option_id'],
+		              //  'CorrectOption' => ['fields' => ['CorrectOption.id','CorrectOption.name']]
+		            ]
+		        ]
+		    ]
+		])->first();
+
+		 $this->request->session()->delete('form.params.quiz');
+		        $candidates = $this->Quizzes->Candidates->find('list',
+												        [ 'keyField' => 'id',
+														  'valueField'=> 'name']   
+												    ); 
+		        $candidates =$candidates->toArray();
+               if(!empty($result)){
+		        $result=$result->toArray(); }
+		        $this->set(compact('result','candidates'));
+
+				$this->render('result');
+
+
+        // }
+    }
+
     public function setquizzQue($question_num = 1){
     	
     	$candidate_id =$this->request->session()->read('Auth.User.candidate_id');
@@ -245,7 +340,7 @@ class QuizzesController extends AppController{
 			$quiz_time = $this->request->session()->read('form.params.quiz.Quiz.quiz_time');
 			$elapsedTime =$this->request->data['data']['Quiz']['elapsedTime'];
 		
-			debug($quizQuestion_id);//save data to db
+		//	debug($quizQuestion_id);//save data to db
 			if(!empty($candidate_ans)){
 				$this->Quizzes->QuizzQuestions->updateAll(
 					    ['option_id' => $candidate_ans],
@@ -296,60 +391,46 @@ class QuizzesController extends AppController{
 				    ['quizz_id' => $quiz['id'],'candidate_id' => $candidate_id]
 				);
 
-				// $this->Quizzes->bindModel(
-			 //        ['hasMany' => ['QuizzQuestions'],'belongsTo' => ['Candidates']]
-			 //    );
-				// $result = $this->Quiz->find('first', array(
-				// 	'fields' => array('Quiz.candidate_id','Quiz.total_questions','Quiz.score','Quiz.quiz_name','Quiz.quiz_time','Quiz.completed_date'),
-		  //       	'conditions' => array('Quiz.id' => $quiz['Quiz']['id']),
-				//     'contain' => array(		        
-				//         'Candidate' => array(
-				//             'fields' => array('Candidate.name')
-				//         )
-				// 	)
-				// ));
+			
         
-
+          //  debug( $quiz['id']);
 				$result = $this->Quizzes->find('all',[
-			'fields' => ['Quizzes.candidate_id','Quizzes.total_questions','Quizzes.score','Quizzes.quiz_name','Quizzes.quiz_time','Quizzes.elapsedTime','Quizzes.completed_date'],
+			//'fields' => ['Quizzes.candidate_id','Quizzes.total_questions','Quizzes.score','Quizzes.quiz_name','Quizzes.quiz_time','Quizzes.elapsedTime','Quizzes.completed_date'],
         	'conditions' =>['Quizzes.id' => $quiz['id']],
 		    'contain' => [		        
-		        // 'Candidate' => array(
-		        //     'fields' => array('Candidate.name'),
-		        //   //	  'conditions' => array('Candidate.id' => $candidate_id),
-		        // ),
-		        'QuizzCandidates' => [
-		            'fields' => ['QuizzCandidates.score','QuizzCandidates.candidate_id','QuizzCandidates.elapsedTime','QuizzCandidates.completed_date'],
-		            'conditions' => ['QuizzCandidate.candidate_id' => $candidate_id]
+		      
+		        'QuizzCandidates'
+		         => [
+		            'fields' => ['QuizzCandidates.quizz_id','QuizzCandidates.score','QuizzCandidates.candidate_id','QuizzCandidates.elapsedTime','QuizzCandidates.completed_date'],
+		            'conditions' => ['QuizzCandidates.candidate_id' => $candidate_id]
 		        ],
 
-		        'QuizzQuestions' => ['fields' => ['QuizzQuestions.id'],	
+		        'QuizzQuestions' => ['fields' => ['QuizzQuestions.quizz_id'],	
 		          'conditions' => ['QuizzQuestions.candidate_id' => $candidate_id],		            
-		            'Options' => ['fields' => ['Options.id','Options.name']],
+		            'Options' => ['fields' => ['Options.id','Options.name','Options.mark']],
 		            'Questions' => [
-		                'fields' => ['Questions.name','Questions.mark'],
-		                'CorrectOption' => ['fields' => ['CorrectOption.id','CorrectOption.name']]
+		                'fields' => ['Questions.name','Questions.mark','Questions.correct_option_id'],
+		              //  'CorrectOption' => ['fields' => ['CorrectOption.id','CorrectOption.name']]
 		            ]
 		        ]
 		    ]
-		]);
-                 debug($result); exit;
+		])->first();
 
-				if (!$result) {
-		            throw new NotFoundException(__('Invalid Quizz'));
-		        }
-		       //debug($result); exit;
+	
 		        $this->request->session()->delete('form.params.quiz');
 		        $candidates = $this->Quizzes->Candidates->find('list',
 												        [ 'keyField' => 'id',
 														  'valueField'=> 'name']   
 												    ); 
+		        $candidates =$candidates->toArray();
+               if(!empty($result)){
+		        $result=$result->toArray(); }
 		        $this->set(compact('result','candidates'));
 
 				$this->render('result');
 									
 				// $this->Session->setFlash('Quiz Submitted!');
-				// $this->redirect(array('action' => 'appear'));
+				 // $this->redirect(array('action' => 'appear'));
 			}
 			
 		} else {
